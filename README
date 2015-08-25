@@ -1,0 +1,21 @@
+
+This work is licensed under the MIT License (see LICENSE file). 
+
+The Czech dictionary for use with the software is distributed 
+as a separate work under GNU GPL v2 license (see 
+https://github.com/ondra-h/CzechStemmerDictionary).
+
+You may either use the tools from command line (see Main class),
+or as a library in your own application. The Main class may be 
+a good starting point to learn how to use the library.
+
+
+DISCLAIMER:
+
+This work is highly experimental, most of it is intended just as a proof-of-concept. 
+There are certainly bugs I don't know of and some of them might be serious (infinite 
+loops, unchecked input etc.)
+ 
+IT IS NOT RECOMMENDED TO DEPLOY AND USE THE SOFTWARE IN A PRODUCTION ENVIRONMENT. 
+ANY USE OF THE SOFTWARE IS AT YOUR OWN RISK.
+ 
