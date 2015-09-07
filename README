@@ -3,7 +3,10 @@ This work is licensed under the MIT License (see LICENSE file).
 
 The Czech dictionary for use with the software is distributed 
 as a separate work under GNU GPL v2 license (see 
-https://github.com/ondra-h/CzechStemmerDictionary).
+https://github.com/ondra-horak/CzechStemmerDictionary).
+
+The Hunspell's .dic and .aff files should mostly work with the tools as well
+but it's not guaranteed.
 
 You may either use the tools from command line (see Main class),
 or as a library in your own application. The Main class may be 
