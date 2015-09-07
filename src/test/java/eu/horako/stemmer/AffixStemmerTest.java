@@ -262,8 +262,8 @@ public class AffixStemmerTest {
     public void setUp() throws IOException, AffixFormatException {
         Reader dictReader = new StringReader(this.dictInput);
         Reader affixReader = new StringReader(this.affixInput);
-        AffixRuleSet ruleSet = new AffixRuleSet(affixReader);
-        Dictionary dict = new Dictionary(dictReader,ruleSet);
+        AffixRuleSet ruleSet = new AffixRuleSet(affixReader,false);
+        Dictionary dict = new Dictionary(dictReader,ruleSet,false);
         this.stemmer = new AffixStemmer(ruleSet,dict);
     }
     

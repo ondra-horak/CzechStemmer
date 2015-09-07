@@ -24,6 +24,7 @@ public class AffixRuleSet {
     AffixMap<String,AffixRule> rulesByFlag = new AffixMap<String,AffixRule>();
     AffixMap<String,AffixRule> pfxRulesByAffix = new AffixMap<String,AffixRule>(); // by append affix
     AffixMap<String,AffixRule> sfxRulesByAffix = new AffixMap<String,AffixRule>();  // by append affix
+    boolean lowerCase;
     
     private class AffixRuleBlock {
         private int count;
@@ -32,21 +33,20 @@ public class AffixRuleSet {
         private boolean crossProduct;
     }
     
-    public AffixRuleSet(String filename) throws IOException, AffixFormatException {
-        InputStream input = new BufferedInputStream(new FileInputStream(new File(filename)));
-        this.load(new InputStreamReader(input,"UTF-8"));
+    public AffixRuleSet(String filename, boolean lowerCase) throws IOException, AffixFormatException {
+        this(new BufferedInputStream(new FileInputStream(new File(filename))),lowerCase);
     }
     
-    public AffixRuleSet(InputStream input) throws IOException, AffixFormatException {
-        this.load(new InputStreamReader(input,"UTF-8"));
+    public AffixRuleSet(InputStream input, boolean lowerCase) throws IOException, AffixFormatException {
+        this(new InputStreamReader(input,"UTF-8"),lowerCase);
     }
 
-    public AffixRuleSet(Reader reader) throws IOException, AffixFormatException {
-        this.load(reader);
+    public AffixRuleSet(Reader reader, boolean lowerCase) throws IOException, AffixFormatException {
+        this.load(reader,lowerCase);
     }
     
     
-    private void load(Reader r) throws IOException, AffixFormatException {
+    private void load(Reader r, boolean lowerCase) throws IOException, AffixFormatException {
         BufferedReader reader = new BufferedReader(r);
 
         String[] params;
@@ -68,7 +68,7 @@ public class AffixRuleSet {
                     state = params[0];
                 }
                 else {
-                    AffixRule rule = this.parseAffixRuleLine(params, affRuleBlock);
+                    AffixRule rule = this.parseAffixRuleLine(params, affRuleBlock, lowerCase);
                     this.insertAffixRule(rule);
                     affRuleBlock.count--;
                     if(affRuleBlock.count <= 0) { state = "OUT"; continue;  }
@@ -98,7 +98,6 @@ public class AffixRuleSet {
     
     private void buildRecursiveRules() {
         for(AffixRule rule : this.rulesByFlag.getAll()) {
-
             if(rule.getExpansionFlags() == null) { continue; }
             for(String flag : rule.getExpansionFlags()) { // prochazim vsechny additional flagy
                 for(AffixRule addRule : this.rulesByFlag.get(flag)) { // pro kazdy flag prochazim pravidla
@@ -134,7 +133,7 @@ public class AffixRuleSet {
     }
     
     
-    private AffixRule parseAffixRuleLine(String[] params, AffixRuleBlock affRuleBlock) throws AffixFormatException {
+    private AffixRule parseAffixRuleLine(String[] params, AffixRuleBlock affRuleBlock, boolean lowerCase) throws AffixFormatException {
         if(params.length < 5) { throw new AffixFormatException("Bad affix line format for flag: " + affRuleBlock.flag); }
         if(!params[1].equals(affRuleBlock.flag)) { throw new AffixFormatException("Bad affix file format: flag mismatch: " + affRuleBlock.flag + " vs. " + params[1]); }
 
@@ -158,6 +157,13 @@ public class AffixRuleSet {
         String condition = params[4];
         String[] properties = (params.length>5)?params[5].split(","):null;
 
+        if(lowerCase) {
+            remove = remove.toLowerCase();
+            append = append.toLowerCase();
+            condition = condition.toLowerCase();
+        }
+        
+        
         return new AffixRule(type,flag,remove,append,addFlags,condition,affRuleBlock.crossProduct, properties);
     }
     

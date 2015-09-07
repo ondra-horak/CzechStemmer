@@ -27,6 +27,7 @@ public class StemFilterFactory extends TokenFilterFactory implements ResourceLoa
     private String dictFile = null;
     private String affixRulesFile = null;
     private ResourceLoader loader;
+    private boolean lowerCase = false;
 
     /**
      *
@@ -36,6 +37,8 @@ public class StemFilterFactory extends TokenFilterFactory implements ResourceLoa
         super(args);
         dictFile = args.get("dictionary").trim();
         affixRulesFile = args.get("affix");
+        String lowerCaseStr = args.get("lowerCase");
+        lowerCase = lowerCaseStr != null && !lowerCaseStr.isEmpty() && (lowerCaseStr.charAt(0)=='1' || lowerCaseStr.toLowerCase().charAt(0)=='t');
     }
     
     @Override
@@ -47,9 +50,9 @@ public class StemFilterFactory extends TokenFilterFactory implements ResourceLoa
     public TokenStream create(TokenStream input) {
         try {
             InputStream rulesStream = this.loader.openResource(affixRulesFile);
-            AffixRuleSet rules = new AffixRuleSet(rulesStream);
+            AffixRuleSet rules = new AffixRuleSet(rulesStream, lowerCase);
             InputStream dictStream = this.loader.openResource(dictFile);
-            Dictionary dict = new Dictionary(dictStream,rules);
+            Dictionary dict = new Dictionary(dictStream, rules, lowerCase);
             this.stemmer = new AffixStemmer(rules,dict);
         } catch (Exception ex) {
             throw new RuntimeException("Unable to load LMCStemFilter data! [dictionary=" + dictFile + ",affix=" + affixRulesFile + "]", ex);

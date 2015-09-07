@@ -23,21 +23,23 @@ import java.util.Set;
  */
 public class Dictionary {
     private final Map<String,List<Set<String>>> dictionary = new HashMap<String,List<Set<String>>>();
+    private boolean lowerCase = false;
 
     public Dictionary() {
     }
-    
-    public Dictionary(InputStream input, AffixRuleSet affixRuleSet) throws IOException {
+
+    public Dictionary(InputStream input, AffixRuleSet affixRuleSet, boolean lowerCase) throws IOException {
+        this.lowerCase = lowerCase;
         this.load(input, affixRuleSet);
     }
-    
-    public Dictionary(Reader reader, AffixRuleSet affixRuleSet) throws IOException {
+
+    public Dictionary(Reader reader, AffixRuleSet affixRuleSet, boolean lowerCase) throws IOException {
+        this.lowerCase = lowerCase;
         this.load(reader, affixRuleSet);
     }
 
-    public Dictionary(String filename, AffixRuleSet affixRuleSet) throws IOException {
-        InputStream input = new FileInputStream(new File(filename));
-        this.load(input, affixRuleSet);
+    public Dictionary(String filename, AffixRuleSet affixRuleSet, boolean lowerCase) throws IOException {
+        this(new FileInputStream(new File(filename)), affixRuleSet, lowerCase);
     }
 
     private void load(InputStream input,AffixRuleSet affixRuleSet) throws IOException {
@@ -54,7 +56,7 @@ public class Dictionary {
             if(pair.length < 2 || pair[0].isEmpty()) { continue; }
             Set<String> flags = affixRuleSet.extractFlags(pair[1]);
 
-            add(pair[0],flags);
+            add(lowerCase ? pair[0].toLowerCase() : pair[0] ,flags);
         }
         reader.close();
     }

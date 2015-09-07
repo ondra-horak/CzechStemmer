@@ -27,6 +27,7 @@ public class Main {
     private final List<String> affixFiles = new ArrayList<String>();
     private int depth = 5;
     private String mode;
+    private boolean lowerCase = false;
 
     /**
      * @param args the command line arguments
@@ -51,6 +52,7 @@ public class Main {
         System.err.println("  expandall - similar to expand but the words are taken from the dictionary file itself;");
         System.err.println("  wordlist - expand words from dictionary with sticky rules and print them");
         System.err.println();
+        System.err.println("  -l convert dictionary, affix rules and the input to lower case");
         System.err.println("  -p <depth> expansion depth: used for expand and expandall modes; default 5\n");
     }
     
@@ -121,7 +123,7 @@ public class Main {
                     
             AffixRuleSet ruleSet;
             try {
-                ruleSet =  new AffixRuleSet(affixFileName);
+                ruleSet =  new AffixRuleSet(affixFileName, lowerCase);
             } catch (AffixFormatException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot read or parse affix file " + affixFileName, ex);
                 System.exit(1);
@@ -134,7 +136,7 @@ public class Main {
             
             Dictionary dictionary = null;
             try {
-                dictionary = new Dictionary(dictFileName,ruleSet);
+                dictionary = new Dictionary(dictFileName, ruleSet, lowerCase);
             } catch (IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot read dictionary file " + dictFileName, ex);
                 System.exit(1);
@@ -150,7 +152,7 @@ public class Main {
     }
     
     private void parseOptions(String[] args) {
-        Getopt g = new Getopt("processor", args, "f:d:a:p:m:h");
+        Getopt g = new Getopt("processor", args, "f:d:a:p:m:lh");
         g.setOpterr(false);
 
         int opt;
@@ -160,6 +162,9 @@ public class Main {
               case 'h':
                   help();
                   System.exit(1);
+                  break;
+              case 'l':
+                  lowerCase = true;
                   break;
               case 'm':
                   mode = g.getOptarg().toLowerCase();
@@ -202,7 +207,7 @@ public class Main {
         while(true) {
             String word = reader.readLine();
             if(word == null) break;
-            word = word.trim();
+            word = lowerCase ? word.trim().toLowerCase() : word.trim();
             Set<String> result = new HashSet<String>();
             for(AffixExpander expander : expanders) {
                 result.addAll(expander.expand(word, depth));
@@ -216,7 +221,6 @@ public class Main {
     }
     
     private long expandall(int depth, List<Pair<Dictionary,AffixRuleSet>> dictAffs) throws IOException {
-        List<AffixExpander> expanders = new ArrayList<AffixExpander>();
         long count = 0;
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
             AffixExpander expander = new AffixExpander(dictAff.second,dictAff.first);
@@ -278,7 +282,7 @@ public class Main {
         while(true) {
             line = reader.readLine();
             if(line == null) break;
-            line = line.trim();
+            line = lowerCase ? line.trim().toLowerCase() : line.trim() ;
             
             Set<String> result = new HashSet<String>();
             for(AffixStemmer stemmer : stemmers) {

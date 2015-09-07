@@ -32,7 +32,6 @@ public class AffixExpander implements IAffixProcessor {
     public AffixExpander(AffixRuleSet ruleSet, Dictionary dictionary) {
         this.ruleSet = ruleSet;
         this.dictionary = dictionary;
-        //this.emptyRule = new AffixRule(AffixRuleType.SFX,"","","",null,".",true,null);
     }
     
     /**
