@@ -10,6 +10,12 @@
     <name>CzechStemmer</name>
     <url>http://maven.apache.org</url>
 
+    <properties>
+       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+       <solr.version>5.5.4</solr.version>
+    </properties>
+
+
     <build>
         <finalName>${project.artifactId}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</finalName>
         <plugins>
@@ -85,21 +91,28 @@
 
     </build>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>4.10.2</version>
+            <version>${solr.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.10.2</version>
+            <version>${solr.version}</version>
         </dependency>
+        <dependency>
+          <groupId>org.apache.solr</groupId>
+          <artifactId>solr-solrj</artifactId>
+          <version>${solr.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.solr</groupId>
+          <artifactId>solr-core</artifactId>
+          <version>${solr.version}</version>
+        </dependency>        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -112,4 +125,6 @@
             <version>1.0.13</version>
         </dependency>
     </dependencies>
+
+
 </project>

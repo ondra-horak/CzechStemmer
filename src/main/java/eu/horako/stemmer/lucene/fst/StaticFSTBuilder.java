@@ -7,10 +7,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.lucene.util.BytesRefBuilder;
 import org.apache.lucene.util.CharsRef;
@@ -31,9 +31,10 @@ public class StaticFSTBuilder {
     private String currentStem = null;
     private String[] currentLine = null;
     private int currentIdx = 0;
-    private String separator=" ";
+    private String inputSeparator=":";
+    private String valuesSeparator=":";
 
-    private class StringMultimap extends HashMap<String,Set<String>> {
+    private class StringMultimap extends TreeMap<String,Set<String>> {
         public void put(String k,String v) {
             Set<String> values = get(k);
             if(values == null) {
@@ -58,6 +59,15 @@ public class StaticFSTBuilder {
         }
     }
 
+    public static void main(String[] args) throws IOException {
+        String inputFile = args[0];
+        String outputFile = args[1];
+        StaticFSTBuilder builder = new StaticFSTBuilder(inputFile);
+        if(args.length > 2) builder.setInputSeparator(args[2]);
+        if(args.length > 3) builder.setInputSeparator(args[3]);
+        FST<CharsRef> fst = builder.createFST();
+        builder.saveFST(fst, outputFile);
+    }
     
     public String join(Collection<String> values, String separator) {
         if(values == null) return null;
@@ -72,8 +82,12 @@ public class StaticFSTBuilder {
         return sb.toString();
     }
     
-    public void setSeparator(String separator) {
-        this.separator = separator;
+    public void setInputSeparator(String s) {
+        inputSeparator = s;
+    }
+
+    public void setValuesSeparator(String s) {
+        valuesSeparator = s;
     }
     
     private class StringPair {
@@ -99,7 +113,7 @@ public class StaticFSTBuilder {
             if(currentLine == null || currentIdx >= currentLine.length) {
                 String line = reader.readLine();
                 if(line == null) return null;
-                currentLine = line.split(separator);
+                currentLine = line.split(inputSeparator);
                 if(currentLine.length < 2 || currentLine[0].isEmpty()) { // read next line
                     currentLine = null;
                     continue;
@@ -133,7 +147,7 @@ public class StaticFSTBuilder {
 
         for(Map.Entry<String,Set<String>> e : smm.entrySet()) {
             String key = e.getKey();
-            String value = join(e.getValue(),separator); 
+            String value = join(e.getValue(),valuesSeparator); 
             scratchBytes.copyChars(key);             
             CharsRefBuilder chrefs = new CharsRefBuilder();
             chrefs.copyChars(value.toCharArray(),0,value.length()); 
@@ -144,6 +158,6 @@ public class StaticFSTBuilder {
     }
 
     public void saveFST(FST<CharsRef> fst, String fileName) throws IOException {
-        fst.save(new File(fileName));
+        fst.save(new File(fileName).toPath());
     }
 }
