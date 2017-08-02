@@ -1,0 +1,15 @@
+
+Usage:
+  CzechStemmer.jar -m <processing-mode> [mode-specific-options]
+
+Available processing modes:
+  stem - read words from stdin and print reduced forms (stems/lemmata) to stdout
+  expand - read basic word forms from stdin and print their expanded forms to stdout
+  expandall - similar to expand but the words are taken from the dictionary file itself;
+  wordlist - expand words from dictionary with sticky rules and print them
+  fstbuild - create a FST file (a string->string dictionary optimized for memory consumption)
+  fstcheck - search in a FST dictionary created in fstbuild mode
+  fstsearch - same as fstcheck
+
+For help on the particular mode, use 
+  CzechStemmer.jar -m <mode> -h

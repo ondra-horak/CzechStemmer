@@ -1,0 +1,13 @@
+
+Usage:
+  CzechStemmer.jar -m stem -d <dict-file> -a <affix-file> [-l] 
+
+Loads a dictionary from dict-file and affix-file and attempts to stem all the 
+word read from stdin according to the rules in the dictionary/affix file. 
+The output is written to stdout.
+
+   -d <dict>   base terms dictionary used for stemming
+   -a <affix-file> file with stem/expansion rules
+   -l          convert dictionary, affix rules and the input to lower case 
+               (use when you require case-insensitive operation)
+

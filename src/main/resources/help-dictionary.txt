@@ -1,0 +1,96 @@
+Usage:
+  CzechStemmer.jar -m <processing-mode> [mode-specific-options]
+
+Available processing modes:
+  stem - read words from stdin and print reduced forms (stems/lemmata) to stdout
+  expand - read basic word forms from stdin and print their expanded forms to stdout
+  expandall - similar to expand but the words are taken from the dictionary file itself;
+  wordlist - expand words from dictionary with sticky rules and print them
+  fstbuild - create a FST file (a string->string dictionary optimized for memory consumption)
+  fstcheck - search in a FST dictionary created in fstbuild mode
+  fstsearch - same as fstcheck
+
+For help on the particular mode, use 
+  CzechStemmer.jar -m <mode> -h
+
+
+Usage:
+  CzechStemmer.jar -m expand -d <dict-file> -a <affix-file> [-p <depth>] [-l] 
+
+Loads a dictionary from dict-file and affix-file and expands words read 
+from stdin using the dictionary and expansion rules. As there may be 
+chained/recursive rules in the dictionary, expansion is done up to some depth 
+that can be set by -p option (default depth is 5).
+The input word list must be in format 1 line = one word.
+
+   -d <dict>   base terms dictionary used for expansion; only words contained
+               in the dictionary can be expanded
+   -a <affix-file> file with expansion rules
+   -p <depth>  expansion depth limit (default 5)
+   -l          convert dictionary, affix rules and the input to lower case 
+               (use when you require case-insensitive operation)
+
+
+ 
+Usage:
+  CzechStemmer.jar -m expandall -d <dict-file> -a <affix-file> [-p <depth>] [-l] 
+
+Loads a dictionary from dict-file and affix-file and expands all words 
+in the dictionary according to the expansion rules in the affix file. 
+As there may be chained/recursive rules in the affix file, expansion is done 
+up to some depth that can be set by -p option (default depth is 5).
+
+   -d <dict>   base terms dictionary used for expansion; only words contained
+               in the dictionary can be expanded
+   -a <affix-file> file with expansion rules
+   -p <depth>  expansion depth limit (default 5)
+   -l          convert dictionary, affix rules and the input to lower case 
+               (use when you require case-insensitive operation)
+
+  
+Usage:
+  CzechStemmer.jar -m wordlist -d <dict-file> -a <affix-file> [-p <depth>] [-l] 
+
+Loads a dictionary from dict-file and affix-file and expands all words 
+in the dictionary according to the sticky expansion rules in the affix file. 
+Unlike expandall mode, only sticky rules are used.
+As there may be chained/recursive rules in the affix file, expansion is done 
+up to some depth that can be set by -p option (default depth is 5).
+
+   -d <dict>   base terms dictionary used for expansion; only words contained
+               in the dictionary can be expanded
+   -a <affix-file> file with expansion rules
+   -p <depth>  expansion depth limit (default 5)
+   -l          convert dictionary, affix rules and the input to lower case 
+               (use when you require case-insensitive operation)
+
+Usage:
+  CzechStemmer.jar -m stem -d <dict-file> -a <affix-file> [-l] 
+
+Loads a dictionary from dict-file and affix-file and attempts to stem all the 
+word read from stdin according to the rules in the dictionary/affix file. 
+The output is written to stdout.
+
+   -d <dict>   base terms dictionary used for stemming
+   -a <affix-file> file with stem/expansion rules
+   -l          convert dictionary, affix rules and the input to lower case 
+               (use when you require case-insensitive operation)
+
+Usage:
+  CzechStemmer.jar -m fstbuild -t <text-file> -f <fst-file> [other-options]
+   
+Creates a dictionary in Lucene FST format and saves it to a file. The dictionary
+can be then used as a memory-efficient dictionary.
+
+    -t <text-file>  input file, each line in format <key>:<value> 
+                    there can be more than one line with the same key
+                    in the dictionary;
+    -f <fst-file>   output FST file
+    -T <input-separator> use other separator than ':' in the input file
+    -F <output-separator> for keys with more than one value, the values in FST
+                          will be separated with this separator (default ':') 
+
+Usage:
+  CzechStemmer.jar -m fstcheck -f <fst-file> [-t <text-file>] [other-options]
+
+

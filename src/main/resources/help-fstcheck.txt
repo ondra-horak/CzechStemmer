@@ -1,0 +1,12 @@
+
+Usage:
+  CzechStemmer.jar -m fstcheck  -f <fst-file> [-t <text-file>] [other-options]
+  CzechStemmer.jar -m fstsearch -f <fst-file> [-t <text-file>] [other-options]
+
+Search in FST dictionary. The input strings are read from stdin by default, 
+or from file given in the -t option. Input file format is one string per line.
+For instructions on building FST dictionary, see fstbuild mode.
+
+   -f <fst-file>  dictionary file
+   -t <text-file> use the given file as input instead of stdin
+

@@ -1,0 +1,16 @@
+
+Usage:
+  CzechStemmer.jar -m expand -d <dict-file> -a <affix-file> [-p <depth>] [-l] 
+
+Loads a dictionary from dict-file and affix-file and expands words read 
+from stdin using the dictionary and expansion rules. As there may be 
+chained/recursive rules in the dictionary, expansion is done up to some depth 
+that can be set by -p option (default depth is 5).
+The input word list must be in format 1 line = one word.
+
+   -d <dict>   base terms dictionary used for expansion; only words contained
+               in the dictionary can be expanded
+   -a <affix-file> file with expansion rules
+   -p <depth>  expansion depth limit (default 5)
+   -l          convert dictionary, affix rules and the input to lower case 
+               (use when you require case-insensitive operation)
