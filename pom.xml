@@ -78,6 +78,47 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <finalName>${project.artifactId}Utils</finalName>
+                    <minimizeJar>false</minimizeJar>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <artifactSet>
+                        <includes>
+                            <include>*getopt*</include>
+                            <include>*lucene*</include>
+                            <include>*slf4j*</include>
+                            <include>*log4j*</include>
+                        </includes>
+                    </artifactSet>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                            <includes>
+                                <include>**</include>
+                            </includes>
+                        </filter>
+                    </filters>
+                </configuration>
+            </plugin>        
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
