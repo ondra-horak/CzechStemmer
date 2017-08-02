@@ -202,7 +202,7 @@ public class FSTBuilder implements IRunner {
 
     private void parseOptions(String[] inputArgs) {
         String[] args  = Arrays.copyOf(inputArgs, inputArgs.length);
-        Getopt g = new Getopt("processor", args, "i:f:T:F:m:h");
+        Getopt g = new Getopt("processor", args, "i:t:f:I:T:F:m:h");
         g.setOpterr(false);
 
         int opt;
@@ -213,12 +213,14 @@ public class FSTBuilder implements IRunner {
                   printHelp = true;
                   break;
               case 'i':
+              case 't':
                   textFile = g.getOptarg();
                   break;
               case 'f':
                   fstFile = g.getOptarg();
                   break;
               case 'I':
+              case 'T':
                   inputSeparator = g.getOptarg();
                   break;
               case 'F':

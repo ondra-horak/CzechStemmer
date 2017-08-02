@@ -5,11 +5,16 @@ Usage:
 Creates a dictionary in Lucene FST format and saves it to a file. The dictionary
 can be then used as a memory-efficient dictionary.
 
+    -i <text-file>
     -t <text-file>  input file, each line in format <key>:<value> 
                     there can be more than one line with the same key
                     in the dictionary;
+
     -f <fst-file>   output FST file
+
+    -I <input-separator>
     -T <input-separator> use other separator than ':' in the input file
+
     -F <output-separator> for keys with more than one value, the values in FST
                           will be separated with this separator (default ':') 
 
