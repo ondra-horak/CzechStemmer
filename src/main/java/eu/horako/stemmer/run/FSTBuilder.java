@@ -37,9 +37,6 @@ import org.slf4j.LoggerFactory;
  */
 public class FSTBuilder implements IRunner {
     public static Logger logger = LoggerFactory.getLogger(FSTBuilder.class);
-    private String currentStem = null;
-    private String[] currentLine = null;
-    private int currentIdx = 0;
     private String inputSeparator=":";
     private Pattern inputSeparatorPattern;
     private String valuesSeparator=":";
@@ -147,23 +144,13 @@ public class FSTBuilder implements IRunner {
 
     private StringPair getNextPair(BufferedReader reader) throws IOException {
         while(true) {
-            if(currentLine == null || currentIdx >= currentLine.length) {
-                String line = reader.readLine();
-                if(line == null) return null;
-                currentLine = inputSeparatorPattern.split(line);
-                if(currentLine.length < 2 || currentLine[0].isEmpty()) { // read next line
-                    currentLine = null;
+            String line = reader.readLine();
+            if(line == null) return null;
+            String[] keyValue = inputSeparatorPattern.split(line,2);
+            if(keyValue.length != 2 || keyValue[0].isEmpty()) { // read next line
                     continue;
-                }
-                currentStem = currentLine[0];
-                currentIdx = 1;
             }
-            String wordForm = currentLine[currentIdx++];
-            if(wordForm.isEmpty()) {
-                currentIdx++;
-                continue;
-            }
-            return new StringPair(wordForm,currentStem);
+            return new StringPair(keyValue[0],keyValue[1]);
         }
     }
     
