@@ -27,7 +27,7 @@ public class FSTDictionaryFilterFactory extends TokenFilterFactory {
 
     public FSTDictionaryFilterFactory(Map<String,String> args) {
         super(args);
-        fstFile = args.get("fstFile").trim();
+        fstFile = args.get("fstFile");
         separator = args.get("separator");
     }
 
