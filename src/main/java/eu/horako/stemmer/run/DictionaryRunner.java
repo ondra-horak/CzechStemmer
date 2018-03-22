@@ -8,9 +8,10 @@ import eu.horako.stemmer.Dictionary;
 import eu.horako.stemmer.Pair;
 import gnu.getopt.Getopt;
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,8 +31,10 @@ public class DictionaryRunner implements IRunner {
     protected final List<String> affixFiles = new ArrayList<String>();
     protected List<Pair<Dictionary,AffixRuleSet>> dictAffList;
     protected boolean lowerCase = false;
+    protected String exceptionsFile = null;
     private int depth = 5;
     private String mode;
+    private final String expandSeparator = ":";
 
     @Override
     public void init(String[] args) throws Exception {
@@ -49,12 +52,18 @@ public class DictionaryRunner implements IRunner {
         BufferedReader reader;
         switch(mode) {
             case "expand":
+            {
                 reader = new BufferedReader(new InputStreamReader(System.in,"UTF-8"));
-                count = expand(reader, depth, dictAffList);
+                Set<String> exceptions = loadExceptions(exceptionsFile);
+                count = expand(reader, depth, dictAffList, exceptions);
                 break;
+            }
             case "expandall":
-                count = expandall(depth, dictAffList);
+            {
+                Set<String> exceptions = loadExceptions(exceptionsFile);
+                count = expandall(depth, dictAffList, exceptions);
                 break;
+            }
             case "wordlist":
                 count = wordList(dictAffList);
                 break;
@@ -74,7 +83,7 @@ public class DictionaryRunner implements IRunner {
 
     private void parseOptions(String[] inputArgs) {
         String[] args  = Arrays.copyOf(inputArgs, inputArgs.length);
-        Getopt g = new Getopt("processor", args, "d:a:m:p:lh");
+        Getopt g = new Getopt("processor", args, "d:a:m:p:e:lh");
         g.setOpterr(true);
 
         int opt;
@@ -92,6 +101,9 @@ public class DictionaryRunner implements IRunner {
                   break;
               case 'd':
                   dictFiles.add(g.getOptarg());
+                  break;
+              case 'e':
+                  exceptionsFile = g.getOptarg();
                   break;
               case 'a':
                   affixFiles.add(g.getOptarg());
@@ -134,11 +146,7 @@ public class DictionaryRunner implements IRunner {
             AffixRuleSet ruleSet;
             try {
                 ruleSet =  new AffixRuleSet(affixFileName, lowerCase);
-            } catch (AffixFormatException ex) {
-                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot read or parse affix file " + affixFileName, ex);
-                System.exit(1);
-                return null;
-            } catch (IOException ex) {
+            } catch (AffixFormatException | IOException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot read or parse affix file " + affixFileName, ex);
                 System.exit(1);
                 return null;
@@ -163,7 +171,7 @@ public class DictionaryRunner implements IRunner {
 
 
 
-    private long expand(BufferedReader reader, int depth, List<Pair<Dictionary,AffixRuleSet>> dictAffs) throws IOException {
+    private long expand(BufferedReader reader, int depth, List<Pair<Dictionary,AffixRuleSet>> dictAffs, Set exceptions) throws IOException {
         List<AffixExpander> expanders = new ArrayList<AffixExpander>();
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
             AffixExpander expander = new AffixExpander(dictAff.second,dictAff.first);
@@ -172,7 +180,7 @@ public class DictionaryRunner implements IRunner {
         }
                 
         long count = 0;
-        PrintStream output = new PrintStream(System.out,true,"UTF-8");
+        OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
         while(true) {
             String word = reader.readLine();
             if(word == null) break;
@@ -182,29 +190,39 @@ public class DictionaryRunner implements IRunner {
                 result.addAll(expander.expand(word, depth));
             }
             for(String s : result) {
-                output.println(word + ":" + s);
+                String outputStr = word + expandSeparator + s;
+                if(!exceptions.contains(outputStr)) {
+                    writer.write(outputStr);
+                    writer.write('\n');
+                }
             }
+            writer.flush();
             count++;
         }
         return count;
     }
     
-    private long expandall(int depth, List<Pair<Dictionary,AffixRuleSet>> dictAffs) throws IOException {
+    private long expandall(int depth, List<Pair<Dictionary,AffixRuleSet>> dictAffs, Set exceptions) throws IOException {
         long count = 0;
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
             AffixExpander expander = new AffixExpander(dictAff.second,dictAff.first);
             expander.expandStickyRules();
 
-            PrintStream output = new PrintStream(System.out,true,"UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
             Iterator<String> wordIterator = dictAff.first.getWords().iterator();
             while(wordIterator.hasNext()) {
                 String word = wordIterator.next();
                 Set<String> result = expander.expand(word, depth);
                 for(String s : result) {
-                    output.println(word + ":" + s);
+                    String outputStr = word + expandSeparator + s;
+                    if(!exceptions.contains(outputStr)) {
+                        writer.write(outputStr);
+                        writer.write('\n');
+                    }
                 }
                 count++;
             }
+            writer.flush();
         }
         return count;
     }
@@ -216,9 +234,10 @@ public class DictionaryRunner implements IRunner {
             AffixRuleSet ruleSet = dictAff.second;
             AffixExpander expander = new AffixExpander(ruleSet,dictionary); 
             expander.expandStickyRules();
-            PrintStream output = new PrintStream(System.out,true,"UTF-8");
+            OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
             for(String s : dictionary.getWords()) {
-                output.println(s);
+                writer.write(s);
+                writer.write('\n');
             }
             count += dictionary.getWords().size();
         }
@@ -247,7 +266,7 @@ public class DictionaryRunner implements IRunner {
         }
         
         String line;
-        PrintStream output = new PrintStream(System.out,true,"UTF-8");
+        OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
         while(true) {
             line = reader.readLine();
             if(line == null) break;
@@ -259,14 +278,44 @@ public class DictionaryRunner implements IRunner {
                 if(r == null) continue;
                 result.addAll(r);
             }
-            output.print(line + ":");
+            writer.write(line + ":");
             for(String s : result) {
-                output.print(" ");
-                output.print(s);
+                writer.write(" ");
+                writer.write(s);
             }
-            output.println();
+            writer.write('\n');
             count++;
         }
         return count;
+    }
+    
+    private Set<String> loadExceptions(String fileName) {
+        Set<String> result = new HashSet<>();
+        if(fileName == null) {
+            return result;
+        }
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName),"UTF-8"));
+            while(true) {
+                String line = reader.readLine();
+                if(line == null) { break; }
+                String[] pair = line.split(expandSeparator);
+                if(pair.length < 2) {
+                    continue;
+                }
+                String lemma = pair[0].trim();
+                String form = pair[1].trim();
+                if(lemma.isEmpty() || form.isEmpty()) {
+                    continue;
+                }
+                result.add(lemma + expandSeparator + form);
+            }
+            reader.close();
+            return result;
+        } catch(IOException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, "Cannot read exceptions file " + fileName, ex);
+            System.exit(1);
+            return null;
+        }
     }
 }

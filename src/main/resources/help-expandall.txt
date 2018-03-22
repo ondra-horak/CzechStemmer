@@ -1,6 +1,12 @@
  
 Usage:
-  CzechStemmer.jar -m expandall -d <dict-file> -a <affix-file> [-p <depth>] [-l] 
+
+CzechStemmer.jar -m expandall 
+                 -d <dict-file> 
+                 -a <affix-file> 
+                 [-p <depth>] 
+                 [-e <exceptions>]
+                 [-l] 
 
 Loads a dictionary from dict-file and affix-file and expands all words 
 in the dictionary according to the expansion rules in the affix file. 
@@ -11,6 +17,8 @@ up to some depth that can be set by -p option (default depth is 5).
                in the dictionary can be expanded
    -a <affix-file> file with expansion rules
    -p <depth>  expansion depth limit (default 5)
+   -e <exceptions> set file with lemma:form pairs that should be excluded
+                   from the result
    -l          convert dictionary, affix rules and the input to lower case 
                (use when you require case-insensitive operation)
 

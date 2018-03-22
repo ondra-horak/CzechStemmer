@@ -1,6 +1,12 @@
 
 Usage:
-  CzechStemmer.jar -m expand -d <dict-file> -a <affix-file> [-p <depth>] [-l] 
+
+CzechStemmer.jar -m expand
+                 -d <dict-file>
+                 -a <affix-file>
+                 [-p <depth>]
+                 [-e <exceptions>]
+                 [-l]
 
 Loads a dictionary from dict-file and affix-file and expands words read 
 from stdin using the dictionary and expansion rules. As there may be 
@@ -12,5 +18,7 @@ The input word list must be in format 1 line = one word.
                in the dictionary can be expanded
    -a <affix-file> file with expansion rules
    -p <depth>  expansion depth limit (default 5)
+   -e <exceptions> set file with lemma:form pairs that should be excluded
+                   from the result
    -l          convert dictionary, affix rules and the input to lower case 
                (use when you require case-insensitive operation)
