@@ -158,7 +158,7 @@ public class FSTBuilder implements IRunner {
     public FST<CharsRef> createFST(BufferedReader reader) throws IOException {
         CharSequenceOutputs outputs = CharSequenceOutputs.getSingleton();
         Builder<CharsRef> builder = 
-                new Builder(FST.INPUT_TYPE.BYTE1, 0, 0, true, true, Integer.MAX_VALUE, outputs, false, PackedInts.DEFAULT, true, 15); 
+                new Builder(FST.INPUT_TYPE.BYTE1, 0, 0, true, true, Integer.MAX_VALUE, outputs, true, 15); 
         BytesRefBuilder scratchBytes = new BytesRefBuilder();
         IntsRefBuilder scratchInts = new IntsRefBuilder();
  
