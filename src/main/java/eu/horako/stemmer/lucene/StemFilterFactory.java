@@ -1,8 +1,10 @@
 package eu.horako.stemmer.lucene;
 
+import eu.horako.stemmer.AffixFormatException;
 import eu.horako.stemmer.AffixRuleSet;
 import eu.horako.stemmer.AffixStemmer;
 import eu.horako.stemmer.Dictionary;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import org.apache.lucene.analysis.TokenStream;
@@ -54,7 +56,7 @@ public class StemFilterFactory extends TokenFilterFactory implements ResourceLoa
             InputStream dictStream = this.loader.openResource(dictFile);
             Dictionary dict = new Dictionary(dictStream, rules, lowerCase);
             this.stemmer = new AffixStemmer(rules,dict);
-        } catch (Exception ex) {
+        } catch (AffixFormatException | IOException ex) {
             throw new RuntimeException("Unable to load LMCStemFilter data! [dictionary=" + dictFile + ",affix=" + affixRulesFile + "]", ex);
         }
 
