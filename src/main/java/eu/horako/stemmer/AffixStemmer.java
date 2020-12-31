@@ -47,7 +47,7 @@ import java.util.Set;
  *   pravidlo, muzu tam prilepit neco jineho; nizka prio, v cestine to asi neni 
  *   moc potreba, zatim si vystacime se stavajicim stavem NIZKA PRIO
  * - zabudovat podporu pro case-folding a ascii-folding (bud jen pro nacitani 
- *   .aff a .dic, nebo i pro vstupni slova - coz se ale v Solru da resit extra
+ *   .aff a .dic, nebo i pro vstupni slova - coz se ale v Lucene/Solr da resit extra
  *   filtry; mozna to nejlepe udelat vsechno konfigurovatelne); pozn. tohle muze
  *   narusit kvalitu stemmingu - orezanim diakritiky muze matchovat vice pravidel
  *   nez s diakritikou, nutno vyresit VYSOKA PRIO

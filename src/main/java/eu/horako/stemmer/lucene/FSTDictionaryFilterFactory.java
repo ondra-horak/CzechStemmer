@@ -8,7 +8,6 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.util.CharsRef;
 import org.apache.lucene.util.fst.CharSequenceOutputs;
 import org.apache.lucene.util.fst.FST;
-import org.apache.solr.common.SolrException;
 
 /**
  * Replaces terms according to a dictionary stored in a FST file.
@@ -37,8 +36,8 @@ public class FSTDictionaryFilterFactory extends TokenFilterFactory {
         try {
             FST<CharsRef> fst = loadFST(fstFile);
             return new FSTDictionaryFilter(input, fst, separator);
-        } catch (Exception ex) {
-            throw new SolrException(SolrException.ErrorCode.SERVER_ERROR, "Unable to load FSTDictionaryFilter data! [fstFile=" + fstFile + "]", ex);
+        } catch (IOException ex) {
+            throw new RuntimeException("Unable to load FSTDictionaryFilter data! [fstFile=" + fstFile + "]", ex);
         }
     }
 
