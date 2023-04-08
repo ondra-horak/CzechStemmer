@@ -15,7 +15,6 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -24,11 +23,11 @@ import java.util.logging.Logger;
 /**
  *
  * @author Ondrej Horak &lt;ondrej.horak@centrum.cz&gt;
- * 
+ *
  */
 public class DictionaryRunner implements IRunner {
-    protected final List<String> dictFiles = new ArrayList<String>();
-    protected final List<String> affixFiles = new ArrayList<String>();
+    protected final List<String> dictFiles = new ArrayList<>();
+    protected final List<String> affixFiles = new ArrayList<>();
     protected List<Pair<Dictionary,AffixRuleSet>> dictAffList;
     protected boolean lowerCase = false;
     protected String exceptionsFile = null;
@@ -75,9 +74,9 @@ public class DictionaryRunner implements IRunner {
                 count = stem(reader,dictAffList);
                 break;
             default:
-                    System.err.println("Unknown mode: " + mode);
-                    System.exit(1);
-                    break;
+                System.err.println("Unknown mode: " + mode);
+                System.exit(1);
+                break;
         }
     }
 
@@ -123,7 +122,7 @@ public class DictionaryRunner implements IRunner {
                   break;
             }
         }
-        
+
         if(printHelp) {
             String helpFile = mode == null ? "help.txt" : ("help-" + mode + ".txt");
             Main.printResourceToStderr(helpFile);
@@ -132,17 +131,17 @@ public class DictionaryRunner implements IRunner {
     }
 
     private List<Pair<Dictionary,AffixRuleSet>> loadDictAffixFiles() {
-        List<Pair<Dictionary,AffixRuleSet>> ret = new ArrayList<Pair<Dictionary,AffixRuleSet>>();
+        List<Pair<Dictionary,AffixRuleSet>> ret = new ArrayList<>();
 
         if(dictFiles.size() != affixFiles.size()) {
             System.err.println("ERROR: Counts of dictionary and affix files differ " + dictFiles.size() + ", " + affixFiles.size());
             System.exit(1);
         }
-        
+
         for(int i = 0; i < dictFiles.size(); i++) {
             String dictFileName = dictFiles.get(i);
             String affixFileName = affixFiles.get(i);
-                    
+
             AffixRuleSet ruleSet;
             try {
                 ruleSet =  new AffixRuleSet(affixFileName, lowerCase);
@@ -151,7 +150,7 @@ public class DictionaryRunner implements IRunner {
                 System.exit(1);
                 return null;
             }
-            
+
             Dictionary dictionary;
             try {
                 dictionary = new Dictionary(dictFileName, ruleSet, lowerCase);
@@ -160,32 +159,32 @@ public class DictionaryRunner implements IRunner {
                 System.exit(1);
                 return null;
             }
-            
-            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Dictionary/Affix file pair loaded: " + dictFileName + " / " + affixFileName);
-            
-            ret.add(new Pair<Dictionary,AffixRuleSet>(dictionary,ruleSet));
-        }        
-        
+
+            Logger.getLogger(Main.class.getName()).log(Level.INFO, "Dictionary/Affix file pair loaded: {0} / {1}", new Object[]{dictFileName, affixFileName});
+
+            ret.add(new Pair<>(dictionary,ruleSet));
+        }
+
         return ret;
     }
 
 
 
     private long expand(BufferedReader reader, int depth, List<Pair<Dictionary,AffixRuleSet>> dictAffs, Set exceptions) throws IOException {
-        List<AffixExpander> expanders = new ArrayList<AffixExpander>();
+        List<AffixExpander> expanders = new ArrayList<>();
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
             AffixExpander expander = new AffixExpander(dictAff.second,dictAff.first);
             expander.expandStickyRules();
-            expanders.add(expander); 
+            expanders.add(expander);
         }
-                
+
         long count = 0;
         OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
         while(true) {
             String word = reader.readLine();
             if(word == null) break;
             word = lowerCase ? word.trim().toLowerCase() : word.trim();
-            Set<String> result = new HashSet<String>();
+            Set<String> result = new HashSet<>();
             for(AffixExpander expander : expanders) {
                 result.addAll(expander.expand(word, depth));
             }
@@ -201,7 +200,7 @@ public class DictionaryRunner implements IRunner {
         }
         return count;
     }
-    
+
     private long expandall(int depth, List<Pair<Dictionary,AffixRuleSet>> dictAffs, Set exceptions) throws IOException {
         long count = 0;
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
@@ -209,9 +208,7 @@ public class DictionaryRunner implements IRunner {
             expander.expandStickyRules();
 
             OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
-            Iterator<String> wordIterator = dictAff.first.getWords().iterator();
-            while(wordIterator.hasNext()) {
-                String word = wordIterator.next();
+            for(String word : dictAff.first.getWords()) {
                 Set<String> result = expander.expand(word, depth);
                 for(String s : result) {
                     String outputStr = word + expandSeparator + s;
@@ -232,7 +229,7 @@ public class DictionaryRunner implements IRunner {
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
             Dictionary dictionary = dictAff.first;
             AffixRuleSet ruleSet = dictAff.second;
-            AffixExpander expander = new AffixExpander(ruleSet,dictionary); 
+            AffixExpander expander = new AffixExpander(ruleSet,dictionary);
             expander.expandStickyRules();
             OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
             for(String s : dictionary.getWords()) {
@@ -249,7 +246,7 @@ public class DictionaryRunner implements IRunner {
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
             Dictionary dictionary = dictAff.first;
             AffixRuleSet ruleSet = dictAff.second;
-            AffixExpander expander = new AffixExpander(ruleSet,dictionary); 
+            AffixExpander expander = new AffixExpander(ruleSet,dictionary);
             expander.expandStickyRules();
             count += dictionary.dump(System.out);
         }
@@ -260,19 +257,19 @@ public class DictionaryRunner implements IRunner {
     private long stem(BufferedReader reader, List<Pair<Dictionary,AffixRuleSet>> dictAffs) throws IOException {
         long count = 0;
 
-        List<AffixStemmer> stemmers = new ArrayList<AffixStemmer>();
+        List<AffixStemmer> stemmers = new ArrayList<>();
         for(Pair<Dictionary,AffixRuleSet> dictAff : dictAffs) {
             stemmers.add(new AffixStemmer(dictAff.second, dictAff.first));
         }
-        
+
         String line;
         OutputStreamWriter writer = new OutputStreamWriter(System.out, "UTF-8");
         while(true) {
             line = reader.readLine();
             if(line == null) break;
             line = lowerCase ? line.trim().toLowerCase() : line.trim() ;
-            
-            Set<String> result = new HashSet<String>();
+
+            Set<String> result = new HashSet<>();
             for(AffixStemmer stemmer : stemmers) {
                 Set<String> r = stemmer.process(line);
                 if(r == null) continue;
@@ -288,7 +285,7 @@ public class DictionaryRunner implements IRunner {
         }
         return count;
     }
-    
+
     private Set<String> loadExceptions(String fileName) {
         Set<String> result = new HashSet<>();
         if(fileName == null) {

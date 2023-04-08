@@ -1,20 +1,22 @@
 package eu.horako.stemmer.lucene;
 
+import eu.horako.stemmer.AffixFormatException;
 import eu.horako.stemmer.AffixRuleSet;
 import eu.horako.stemmer.AffixStemmer;
 import eu.horako.stemmer.Dictionary;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.util.ResourceLoader;
-import org.apache.lucene.analysis.util.ResourceLoaderAware;
-import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.apache.lucene.util.ResourceLoader;
+import org.apache.lucene.util.ResourceLoaderAware;
+import org.apache.lucene.analysis.TokenFilterFactory;
 
 /**
  * @author Ondrej Horak &lt;ondrej.horak@centrum.cz&gt;
- * 
- * Factory for {@see StemFilter}. 
- * <pre class="prettyprint" > 
+ *
+ * Factory for {@see StemFilter}.
+ * <pre class="prettyprint" >
  * &lt;fieldType name="text_czstem" class="solr.TextField" positionIncrementGap="100"&gt;
  * &lt;analyzer&gt; &lt;tokenizer class="solr.StandardTokenizerFactory"/&gt;
  * &lt;filter class="solr.LowerCaseFilterFactory"/&gt; &lt;filter
@@ -40,12 +42,12 @@ public class StemFilterFactory extends TokenFilterFactory implements ResourceLoa
         String lowerCaseStr = args.get("lowerCase");
         lowerCase = lowerCaseStr != null && !lowerCaseStr.isEmpty() && (lowerCaseStr.charAt(0)=='1' || lowerCaseStr.toLowerCase().charAt(0)=='t');
     }
-    
+
     @Override
     public void inform(ResourceLoader loader) {
          this.loader = loader;
     }
-    
+
     @Override
     public TokenStream create(TokenStream input) {
         try {
@@ -54,7 +56,7 @@ public class StemFilterFactory extends TokenFilterFactory implements ResourceLoa
             InputStream dictStream = this.loader.openResource(dictFile);
             Dictionary dict = new Dictionary(dictStream, rules, lowerCase);
             this.stemmer = new AffixStemmer(rules,dict);
-        } catch (Exception ex) {
+        } catch (AffixFormatException | IOException | RuntimeException ex) {
             throw new RuntimeException("Unable to load LMCStemFilter data! [dictionary=" + dictFile + ",affix=" + affixRulesFile + "]", ex);
         }
 

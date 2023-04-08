@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.lucene.analysis.TokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.tokenattributes.KeywordAttribute;
 import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 
 /**
@@ -17,9 +16,8 @@ import org.apache.lucene.analysis.tokenattributes.PositionIncrementAttribute;
 public final class StemFilter extends TokenFilter {
     private final PositionIncrementAttribute posIncAtt = (PositionIncrementAttribute) addAttribute(PositionIncrementAttribute.class);
     private final AffixStemmer stemmer;
-  
+
     private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
-    private final KeywordAttribute keywordAttr = addAttribute(KeywordAttribute.class);
     private State savedState;
     List<String> buffer;
 
@@ -32,7 +30,6 @@ public final class StemFilter extends TokenFilter {
     public boolean incrementToken() throws IOException {
         if (buffer != null && !buffer.isEmpty()) { // more stems from previous run
             String nextStem = buffer.remove(0); // get stem
-//Logger.getLogger(StemFilter.class.getName()).log(Level.INFO, "NEXT STEM={0}", nextStem);
             restoreState(savedState); // restore previous state of the token stream
             posIncAtt.setPositionIncrement(0); // this otput token has the same position in the text as previous
 
@@ -46,7 +43,7 @@ public final class StemFilter extends TokenFilter {
             return false;
         }
 
-        buffer = new ArrayList<String>();
+        buffer = new ArrayList<>();
         buffer.addAll(stemmer.stem(termAtt.toString()));
 
         String stem;
@@ -56,7 +53,6 @@ public final class StemFilter extends TokenFilter {
             stem = buffer.remove(0);
         }
 
-//Logger.getLogger(StemFilter.class.getName()).log(Level.INFO, "TERM={0} STEM={1}", new Object[]{termAtt.toString(), stem});
         termAtt.copyBuffer(stem.toCharArray(), 0, stem.length());
         if(!buffer.isEmpty()) { // save state to be restored in the next round
             savedState = captureState();
